@@ -5,6 +5,7 @@ if(!defined("IN_MYBB"))
 }
 
 $plugins->add_hook("parse_message", "staff_only_text_run");
+$plugins->add_hook("parse_quoted_message", "parse_new_reply");
 
 function staff_only_text_info()
 {
@@ -14,10 +15,18 @@ global $mybb;
 		"description"		=> "Staff only viewable text",
 		"author"			=> "scripthead",
 		"authorsite"		=> "https://scripthead.me",
-		"version"			=> "1.0.0",
+		"version"			=> "1.0.1",
 		"codename"			=> "staff_only_text",
 		"compatibility"		=> "*",
 	);
+}
+
+function parse_new_reply(&$message)
+{
+	if (!has_permission())
+	{
+		$message = preg_replace('#\[staff\](.*?)\[\/staff\]#si','Only staff may view this text',$message);
+	}
 }
 
 function staff_only_text_activate()
@@ -42,14 +51,13 @@ function staff_only_text_activate()
 
     $i = 1;
 
-    foreach ($settings as &$row) {
+	foreach ($settings as &$row)
 		$row['gid']         = $settingGroupId;
-        $row['title']       = $db->escape_string($row['title']);
-        $row['description'] = $db->escape_string($row['description']);
-        $row['disporder']   = $i++;
-    }
+		$row['description'] = $db->escape_string($row['description']);
+		$row['disporder']   = $i++;
+	}
 
-    $db->insert_query_multiple('settings', $settings);
+	$db->insert_query_multiple('settings', $settings);
 
     rebuild_settings();
 }
