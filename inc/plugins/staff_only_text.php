@@ -52,7 +52,9 @@ function staff_only_text_activate()
     $i = 1;
 
 	foreach ($settings as &$row)
+	{
 		$row['gid']         = $settingGroupId;
+		$row['title']       = $db->escape_string($row['title']);
 		$row['description'] = $db->escape_string($row['description']);
 		$row['disporder']   = $i++;
 	}
